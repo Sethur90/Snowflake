@@ -1,5 +1,4 @@
 import UIKit
-import Reindeers
 
 public class Path: Item, ShapeAware {
     public let path: UIBezierPath

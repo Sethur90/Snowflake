@@ -1,60 +1,32 @@
-//
-//  Utils.swift
-//  Snowflake
-//
-//  Created by khoa on 14/05/2019.
-//  Copyright © 2019 Khoa Pham. All rights reserved.
-//
-
 import UIKit
 
 struct Utils {
 
     static func number(string: String) -> CGFloat {
-        var number: Float = 0
         let scanner = Scanner(string: string)
-        scanner.scanFloat(&number)
-
-        return CGFloat(number)
+        return scanner.scanFloat().map { CGFloat($0) } ?? 0
     }
 
     static func numbers(string: String?) -> [CGFloat] {
-        guard let string = string else {
-            return []
-        }
+        guard let string = string else { return [] }
 
-        var number: Float = 0
         let scanner = Scanner(string: string)
         var numbers = [CGFloat]()
 
-        repeat {
-            let result = scanner.scanFloat(&number)
-
-            if result {
-                numbers.append(CGFloat(number))
+        while !scanner.isAtEnd {
+            if let value = scanner.scanFloat() {
+                numbers.append(CGFloat(value))
+            } else if !scanner.isAtEnd {
+                scanner.currentIndex = string.index(after: scanner.currentIndex)
             }
-
-            if scanner.scanLocation < string.count - 1 {
-                if !result {
-                    scanner.scanLocation += 1
-                }
-            } else {
-                break
-            }
-
-        } while true
+        }
 
         return numbers
     }
 
     static func isLowercase(string: String) -> Bool {
-        let set = CharacterSet.lowercaseLetters
-
-        if let scala = UnicodeScalar(string) {
-            return set.contains(scala)
-        } else {
-            return false
-        }
+        guard let scalar = UnicodeScalar(string) else { return false }
+        return CharacterSet.lowercaseLetters.contains(scalar)
     }
 
     static func points(string: String?) -> [CGPoint] {
@@ -64,10 +36,9 @@ struct Utils {
         }
 
         var points = [CGPoint]()
-
-        numbers.enumerated().forEach { (index, _) in
+        numbers.enumerated().forEach { index, _ in
             if index % 2 == 0 {
-                points.append(CGPoint(x: numbers[index], y: numbers[index+1]))
+                points.append(CGPoint(x: numbers[index], y: numbers[index + 1]))
             }
         }
 
@@ -84,29 +55,24 @@ struct Utils {
 
     static func bounds(layers: [CALayer]) -> CGRect {
         let paths: [CGPath] = layers.compactMap {
-            return ($0 as? CAShapeLayer)?.path
+            ($0 as? CAShapeLayer)?.path
         }
-
         return bounds(paths: paths)
     }
 
     static func bounds(paths: [CGPath]) -> CGRect {
         var rect = CGRect.zero
-
         paths.forEach { path in
             rect = path.boundingBox.union(rect)
         }
-
         return rect
     }
 
     static func transform(layers: [CALayer], transform: CGAffineTransform) {
         for layer in layers {
             if let layer = layer as? CAShapeLayer, let cgPath = layer.path {
-
                 let path = UIBezierPath(cgPath: cgPath)
                 path.apply(transform)
-
                 layer.path = path.cgPath
             }
         }

@@ -2,53 +2,32 @@ import CoreGraphics
 import Foundation
 import UIKit
 
-extension Dictionary {
-  
-  func number(key: String) -> CGFloat? {
-    if let key = key as? Key,
-      let value = self[key] as? String {
-      return Utils.number(string: value)
+extension Dictionary where Key == String, Value == String {
+
+    func number(key: String) -> CGFloat? {
+        guard let value = self[key] else { return nil }
+        return Utils.number(string: value)
     }
-    
-    return nil
-  }
-  
-  func string(key: String) -> String? {
-    if let key = key as? Key {
-      return self[key] as? String
+
+    func string(key: String) -> String? {
+        return self[key]
     }
-    
-    return nil
-  }
-  
-  func color(key: String) -> UIColor? {
-    if let value = string(key: key) {
-      return Color.color(name: value)
+
+    func color(key: String) -> UIColor? {
+        guard let value = self[key] else { return nil }
+        return Color.color(name: value)
     }
-    
-    return nil
-  }
-  
-  func merge(another: JSONDictionary) -> JSONDictionary {
-    var result = JSONDictionary()
-    
-    self.forEach {
-      if let key = $0 as? String {
-        result[key] = $1
-      }
+
+    func merge(another: [String: String]) -> [String: String] {
+        var result = self
+        another.forEach { result[$0] = $1 }
+        return result
     }
-    
-    another.forEach {
-      result[$0] = $1
-    }
-    
-    return result
-  }
 }
 
 extension String {
 
-  func trim() -> String {
-    return self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-  }
+    func trim() -> String {
+        return self.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 }

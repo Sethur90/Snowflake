@@ -1,28 +1,22 @@
 import UIKit
-import Reindeers
 
 public class Polygon: Item, ShapeAware {
 
-  public var points: [CGPoint] = []
-  
-  public required init(attributes: JSONDictionary) {
-    self.points = Utils.points(string: attributes.string(key: "points"))
+    public var points: [CGPoint] = []
 
-    super.init(attributes: attributes)
-  }
+    public required init(attributes: JSONDictionary) {
+        self.points = Utils.points(string: attributes.string(key: "points"))
 
-  public lazy var path: UIBezierPath = {
-    let path = UIBezierPath()
-    if let first = self.points.first {
-      path.move(to: first)
-
-      self.points.dropFirst().forEach {
-        path.addLine(to: $0)
-      }
-
-      path.close()
+        super.init(attributes: attributes)
     }
 
-    return path
-  }()
+    public lazy var path: UIBezierPath = {
+        let path = UIBezierPath()
+        if let first = self.points.first {
+            path.move(to: first)
+            self.points.dropFirst().forEach { path.addLine(to: $0) }
+            path.close()
+        }
+        return path
+    }()
 }
